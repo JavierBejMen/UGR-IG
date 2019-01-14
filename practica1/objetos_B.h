@@ -19,7 +19,7 @@ class _puntos3D
 {
 public:
 
-  
+
 	_puntos3D();
 void 	draw_puntos(float r, float g, float b, int grosor);
 
@@ -67,7 +67,13 @@ public:
 };
 
 
+//*************************************************************************
+// clase tetraedro
+//*************************************************************************
 
+class _tetraedro: public _triangulos3D{
+  
+public:
+  _tetraedro(float tam=0.5, float al=0.75);
 
-
-
+};

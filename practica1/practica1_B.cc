@@ -24,11 +24,18 @@ GLfloat Observer_angle_y;
 GLfloat Window_width,Window_height,Front_plane,Back_plane;
 
 // variables que determninan la posicion y tamaño de la ventana X
-int UI_window_pos_x=50,UI_window_pos_y=50,UI_window_width=450,UI_window_height=450;
+int UI_window_pos_x=50,UI_window_pos_y=50,UI_window_width=800,UI_window_height=800;
 
-
+//Objetos
 _piramide piramide(0.85,1.3);
 _cubo cubo(0.2);
+_tetraedro tetraedro(0.85, 1.3);
+
+// Variable para seleccionar el objeto a dibujar
+int ob = 0;
+
+// Variable para seleccionar el modo de dibujo
+int mode = 2; //Aristas por defecto
 
 //**************************************************************************
 //
@@ -100,8 +107,25 @@ glEnd();
 
 void draw_objects()
 {
-     
- piramide.draw_aristas(1.0,0.5,0.0,3);
+  switch (ob) {
+
+    case 1:
+      if(mode==1)tetraedro.draw_puntos(1,0.5,1,7);
+      if(mode==2)tetraedro.draw_aristas(1,0.5,1,3);
+      if(mode==3)tetraedro.draw_solido(1,0.5,1);
+      if(mode==4)tetraedro.draw_solido_ajedrez(1,0.5,1,0,0,0);
+    break;
+
+    case 2:
+      if(mode==1)cubo.draw_puntos(0.5,1,0.5,7);
+      if(mode==2)cubo.draw_aristas(0.5,1,0.5,3);
+      if(mode==3)cubo.draw_solido(0.5,1,0.5);
+      if(mode==4)cubo.draw_solido_ajedrez(0.5,1,0.5,0,0,0);
+    break;
+
+    default:
+      piramide.draw_aristas(1.0,0.5,0.0,3);
+  }
 }
 
 
@@ -110,7 +134,7 @@ void draw_objects()
 //
 //***************************************************************************
 
-void draw_scene(void)
+void draw_scene()
 {
 
 clear_window();
@@ -151,6 +175,31 @@ void normal_keys(unsigned char Tecla1,int x,int y)
 {
 
 if (toupper(Tecla1)=='Q') exit(0);
+if (toupper(Tecla1)=='2'){
+    ob = 2;
+    draw_scene();
+}
+if (toupper(Tecla1)=='1'){
+    ob = 1;
+    draw_scene();
+}
+if (toupper(Tecla1)=='P'){
+    mode = 1;
+    draw_scene();
+}
+if (toupper(Tecla1)=='L'){
+    mode = 2;
+    draw_scene();
+}
+if (toupper(Tecla1)=='F'){
+    mode = 3;
+    draw_scene();
+}
+if (toupper(Tecla1)=='C'){
+    mode = 4;
+    draw_scene();
+}
+
 }
 
 //***************************************************************************
@@ -217,7 +266,7 @@ glViewport(0,0,UI_window_width,UI_window_height);
 int main(int argc, char **argv)
 {
     // se llama a la inicialización de glut
-    
+
     glutInit(&argc, argv);
 
     // se indica las caracteristicas que se desean para la visualización con OpenGL
