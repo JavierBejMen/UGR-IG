@@ -288,18 +288,22 @@ int num_aux;
 vector<bool> excluido;
 unsigned int num_excluidos = 0;
 
-for (std::vector<_vertex3f>::iterator it = perfil.begin(); it != perfil.end(); ++it){
-	if(it->x == 0){
+for (unsigned int i = 0; i < perfil.size(); ++i){
+	if(perfil[i].x == 0){
 		excluido.push_back(true);
 		++num_excluidos;
 	}else{
 		excluido.push_back(false);
 	}
+	//std::cout << "excluido[" << i << "]:"<< excluido.front() << '\n';
 }
+//std::cout << "num_excluidos:" << num_excluidos << '\n';
+
 
 // tratamiento de los vértice
 
 num_aux=perfil.size();
+//std::cout << "num_aux:" << num_aux << '\n';
 for (j=0;j<num;j++)
   {for (i=0;i<num_aux;i++)
      {

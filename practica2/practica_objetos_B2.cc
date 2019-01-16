@@ -12,7 +12,7 @@
 using namespace std;
 
 // tipos
-typedef enum{CUBO, PIRAMIDE, OBJETO_PLY, ROTACION} _tipo_objeto;
+typedef enum{CUBO, PIRAMIDE, OBJETO_PLY, ROTACION, CONO, CILINDRO, ESFERA} _tipo_objeto;
 _tipo_objeto t_objeto=CUBO;
 _modo   modo=POINTS;
 
@@ -31,8 +31,8 @@ int Window_x=50,Window_y=50,Window_width=450,Window_high=450;
 // objetos
 _cubo cubo;
 _piramide piramide(0.85,1.3);
-_objeto_ply  ply; 
-_rotacion rotacion; 
+_objeto_ply  ply;
+_rotacion rotacion, cono, cilindro, esfera;
 
 // _objeto_ply *ply1;
 
@@ -84,7 +84,7 @@ glRotatef(Observer_angle_y,0,1,0);
 
 void draw_axis()
 {
-	
+
 glDisable(GL_LIGHTING);
 glLineWidth(2);
 glBegin(GL_LINES);
@@ -116,6 +116,9 @@ switch (t_objeto){
 	case PIRAMIDE: piramide.draw(modo,1.0,0.0,0.0,0.0,1.0,0.0,2);break;
         case OBJETO_PLY: ply.draw(modo,1.0,0.6,0.0,0.0,1.0,0.3,2);break;
         case ROTACION: rotacion.draw(modo,1.0,0.0,0.0,0.0,1.0,0.0,2);break;
+				case CONO: cono.draw(modo,1.0,0.0,0.0,0.0,1.0,0.0,2);break;
+				case CILINDRO: cilindro.draw(modo,1.0,0.0,0.0,0.0,1.0,0.0,2);break;
+				case ESFERA: esfera.draw(modo,1.0,0.0,0.0,0.0,1.0,0.0,2);break;
 	}
 
 }
@@ -176,8 +179,11 @@ switch (toupper(Tecla1)){
 	case '4':modo=SOLID_CHESS;break;
         case 'P':t_objeto=PIRAMIDE;break;
         case 'C':t_objeto=CUBO;break;
-        case 'O':t_objeto=OBJETO_PLY;break;	
+        case 'O':t_objeto=OBJETO_PLY;break;
         case 'R':t_objeto=ROTACION;break;
+				case '5':t_objeto=CONO;break;
+				case '6':t_objeto=CILINDRO;break;
+				case '7':t_objeto=ESFERA;break;
 	}
 glutPostRedisplay();
 }
@@ -250,13 +256,13 @@ glViewport(0,0,Window_width,Window_high);
 
 int main(int argc, char *argv[] )
 {
- 
 
 
 
-// perfil 
 
-vector<_vertex3f> perfil2;
+// perfil
+
+vector<_vertex3f> perfil2, perfil_cono, perfil_cilindro, perfil_esfera;
 _vertex3f aux;
 
 aux.x=1.0; aux.y=-1.0; aux.z=0.0;
@@ -289,6 +295,37 @@ perfil2.push_back(aux);
 aux.x=0.3;aux.y=1.4;aux.z=0.0;
 perfil2.push_back(aux);
 */
+
+//Perfil cono
+aux.x=1.0;aux.y=-1.0;aux.z=0.0;
+perfil_cono.push_back(aux);
+aux.x=0.0;aux.y=2.0;aux.z=0.0;
+perfil_cono.push_back(aux);
+cono.parametros(perfil_cono, 50);
+
+//Perfil cilindro
+aux.x=1.0;aux.y=-1.0;aux.z=0.0;
+perfil_cilindro.push_back(aux);
+aux.x=1.0;aux.y=1.0;aux.z=0.0;
+perfil_cilindro.push_back(aux);
+cilindro.parametros(perfil_cilindro, 50);
+
+//Perfil esfera
+
+for(float i = 0.0; i < 1; i+=0.001){
+	aux.x = i;
+	aux.y = (-1)*sqrt(1-i*i);
+	aux.z = 0.0;
+	perfil_esfera.push_back(aux);
+}
+for(float i = 1; i >= 0; i-=0.001){
+	aux.x = i;
+	aux.y = sqrt(1-i*i);
+	aux.z = 0.0;
+	perfil_esfera.push_back(aux);
+}
+
+esfera.parametros(perfil_esfera, 50);
 
 
 // se llama a la inicialización de glut
