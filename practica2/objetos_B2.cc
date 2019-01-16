@@ -333,12 +333,23 @@ for (j=0;j<num;j++){
 }
 
  // tapa inferior
-if (fabs(perfil[0].x)>0.0)
-  {
-  }
+if (fabs(perfil[0].x)>0.0){
+	for(unsigned int i = num-1; i > 1; --i){
+		cara_aux._0 = transform((num-1) * num_aux, num_aux, num_excluidos, excluido);
+		cara_aux._1 = transform((i-1) * num_aux, num_aux, num_excluidos, excluido);
+		cara_aux._2 = transform((i-2) * num_aux, num_aux, num_excluidos, excluido);
+		caras.push_back(cara_aux);
+	}
+
+}
 
  // tapa superior
- if (fabs(perfil[num_aux-1].x)>0.0)
-  {
-  }
+	if (fabs(perfil[num_aux-1].x)>0.0){
+		for(unsigned int i = 0; i < num-2; ++i){
+			cara_aux._0 = num_aux-1;
+			cara_aux._1 = transform((num_aux-1) + ((i+1) * num_aux), num_aux, num_excluidos, excluido);
+			cara_aux._2 = transform((num_aux-1) + ((i+2) * num_aux), num_aux, num_excluidos, excluido);
+			caras.push_back(cara_aux);
+		}
+	}
 }
