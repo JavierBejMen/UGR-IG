@@ -4,56 +4,33 @@
 #
 TARGETS= practica1_B
 
-# banderas para el compilador (C y C++). Se indican los directorios donde se puenden
-# encontrar ficheros para incluir mediante la opcion -I
-# la opcion -g sirve para permitir la depuración
-#
-CFLAGS=    -g -DXWINDOWS -DSHM -I/usr/include -I.
-CXXFLAGS=  -g -DXWINDOWS -DSHM -I/usr/include -I.
+BIN = bin
+SRC = src
+OBJ = obj
+LIB = lib
+INCLUDE = include
 
-# banderas pra el enlazador
-# Se indica directorios donde encontrar las funciontecas con -L. Usando -l seguido del
-# nombre se indica la funcionteca que se desea enlazar.
-#
-LDFLAGS=  -lGL -lGLU -lglut -lm
-
-# definicion del compilador
-#
 CC = g++
+CCFLAGS = -std=c++11 -Wall -O3
+GLFLAGS = -lGL -lGLU -lglut
 
-# orden que sera ejecutada por defecto
-#
-default : $(TARGETS)
+MAINDEPENDENCIES = $(OBJ)/objetos_B.o $(OBJ)/main.o
 
-# regla de ejecucion
-#
-$(TARGETS) : objetos_B.o practica1_B.o
-	$(CC) -o $@ $(CXXFLAGS) objetos_B.o practica1_B.o $(LDFLAGS)
+TARGETS = clean $(BIN)/main
 
-#
-#
+all: $(TARGETS)
+
+$(BIN)/main: $(MAINDEPENDENCIES)
+	$(CC) $^ $(GLFLAGS) $(CCFLAGS) -o $@
+
+$(OBJ)/main.o: $(SRC)/main.cpp
+	$(CC) $(CCFLAGS) -c -o $@ $^ -I$(INCLUDE)
+
+$(OBJ)/objetos_B.o: $(SRC)/objetos_B.cpp
+	$(CC) $(CCFLAGS) -c -o $@ $^ -I$(INCLUDE)
+
+# Clean
+.PHONY: clean
+
 clean:
-	rm -f *.o
-	rm -f $(TARGETS)
-
-#
-#
-redo:
-	touch *.cc
-	make
-
-#
-#
-superclean:
-	rm -f *.o
-	rm *~
-	rm -f $(TARGETS)
-
-#
-#
-tgz:
-	rm -f *.o
-	rm *~
-	rm -f $(TARGETS)
-	tar -zcvf $(TARGETS).tgz *
-
+	-rm $(BIN)/* $(OBJ)/*

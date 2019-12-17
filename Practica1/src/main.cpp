@@ -26,9 +26,13 @@ GLfloat Window_width,Window_height,Front_plane,Back_plane;
 // variables que determninan la posicion y tamaño de la ventana X
 int UI_window_pos_x=50,UI_window_pos_y=50,UI_window_width=450,UI_window_height=450;
 
-
+// Objetos
 _piramide piramide(0.85,1.3);
 _cubo cubo(0.2);
+
+// Variables de control
+_triangulos3D *current_object = &piramide;
+int draw_mode = 0;
 
 //**************************************************************************
 //
@@ -100,8 +104,21 @@ glEnd();
 
 void draw_objects()
 {
-     
- piramide.draw_aristas(1.0,0.5,0.0,3);
+  switch (draw_mode) {
+    case 0:
+      current_object->draw_puntos(1.,.5,.0,3);
+      break;
+    case 1:
+      current_object->draw_aristas(1.0,0.5,0.0,3);
+      break;
+    case 2:
+      current_object->draw_solido(1.0,0.5,0.0);
+      break;
+    case 3:
+      current_object->draw_solido_ajedrez(1.0,0.5,0.0,.0,.5,1.);
+    default:
+      break;
+  }
 }
 
 
@@ -151,6 +168,13 @@ void normal_keys(unsigned char Tecla1,int x,int y)
 {
 
 if (toupper(Tecla1)=='Q') exit(0);
+if (toupper(Tecla1)=='P') draw_mode=0;
+if (toupper(Tecla1)=='L') draw_mode=1;
+if (toupper(Tecla1)=='F') draw_mode=2;
+if (toupper(Tecla1)=='C') draw_mode=3;
+if (Tecla1=='1') current_object = &piramide;
+if (Tecla1=='2') current_object = &cubo;
+glutPostRedisplay();
 }
 
 //***************************************************************************
@@ -217,7 +241,7 @@ glViewport(0,0,UI_window_width,UI_window_height);
 int main(int argc, char **argv)
 {
     // se llama a la inicialización de glut
-    
+
     glutInit(&argc, argv);
 
     // se indica las caracteristicas que se desean para la visualización con OpenGL

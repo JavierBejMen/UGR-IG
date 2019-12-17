@@ -17,3 +17,8 @@ Con esta práctica se quiere que el alumno aprenda:
 - Tecla c: Visualizar en modo ajedrez
 - Tecla 1: Activar tetraedro
 - Tecla 2: Activar cubo
+
+## Evaluación
+- Creación de la clase cubo y su visualización (6 pt.)
+- Creación del código que permite visualizar en modo relleno. (2pt)
+- Creación del código que permite visualizar en modo ajedrez. (2pt)

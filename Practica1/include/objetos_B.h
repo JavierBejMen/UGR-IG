@@ -19,7 +19,7 @@ class _puntos3D
 {
 public:
 
-  
+
 	_puntos3D();
 void 	draw_puntos(float r, float g, float b, int grosor);
 
@@ -65,9 +65,3 @@ public:
 
 	_piramide(float tam=0.5, float al=0.75);
 };
-
-
-
-
-
-
