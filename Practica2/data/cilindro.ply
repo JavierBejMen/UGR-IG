@@ -8,4 +8,4 @@ element face 0
 property list uint8 int32 vertex_indices
 end_header
 0.5 -0.5 0.0
-0.0 0.5 0.0
+0.5 0.5 0.0

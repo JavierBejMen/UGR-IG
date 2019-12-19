@@ -11,7 +11,14 @@ LIB = lib
 INCLUDE = include
 
 CC = g++
-CCFLAGS = -std=c++11 -Wall -O3
+CCFLAGS = -std=c++11 -O3
+
+ifndef NOWARN
+	CCFLAGS += -Wall -Wextra
+else
+	CCFLAGS += -w
+endif
+
 GLFLAGS = -lGL -lGLU -lglut
 
 MAINDEPENDENCIES = $(OBJ)/objetos_B.o $(OBJ)/main.o $(OBJ)/file_ply_stl.o

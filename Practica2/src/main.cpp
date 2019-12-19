@@ -11,9 +11,12 @@
 #include <GL/glut.h>
 #include <ctype.h>
 #include "objetos_B.h"
+#include <iostream>
+#include <algorithm>
+
 
 // tamaño de los ejes
-//const int AXIS_SIZE=5000;
+
 
 // variables que definen la posicion de la camara en coordenadas polares
 GLfloat Observer_distance;
@@ -24,13 +27,14 @@ GLfloat Observer_angle_y;
 GLfloat Window_width,Window_height,Front_plane,Back_plane;
 
 // variables que determninan la posicion y tamaño de la ventana X
-int UI_window_pos_x=50,UI_window_pos_y=50,UI_window_width=450,UI_window_height=450;
+int UI_window_pos_x=50,UI_window_pos_y=50,UI_window_width=920,UI_window_height=920;
 
 // Objetos
 _piramide piramide(0.85,1.3);
 _cubo cubo(0.2);
 _objeto_ply  ply;
-_rotacion cono, cilindro, esfera;
+_rotacion cono, cilindro, prueba;
+_esfera esfera;
 
 // Variables de control
 _triangulos3D *current_object = &piramide;
@@ -152,7 +156,8 @@ glutSwapBuffers();
 void change_window_size(int Ancho1,int Alto1)
 {
 change_projection();
-glViewport(0,0,Ancho1,Alto1);
+
+glViewport(0,0,min(Ancho1,Alto1),min(Ancho1,Alto1));
 glutPostRedisplay();
 }
 
@@ -180,6 +185,8 @@ if (Tecla1=='3') current_object = &cono;
 if (Tecla1=='4') current_object = &cilindro;
 if (Tecla1=='5') current_object = &esfera;
 if (Tecla1=='6') current_object = &ply;
+if (Tecla1=='7') current_object = &prueba;
+
 glutPostRedisplay();
 }
 
@@ -285,7 +292,10 @@ int main(int argc, char **argv)
 
     // creación de objetos ply
     ply.parametros(argv[1]);
-    cono.parametros("data/cono", 10);
+    cono.parametros("data/cono", 40);
+    cilindro.parametros("data/cilindro", 40);
+    prueba.parametros("data/prueba", 20, Z, 2*M_PI*0.75);
+    esfera.parametros(0.5, 40);
 
     // inicio del bucle de eventos
     glutMainLoop();

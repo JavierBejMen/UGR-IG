@@ -11,6 +11,8 @@ using namespace std;
 
 const float AXIS_SIZE=5000;
 
+enum eje_rot{X=0,Y,Z};
+
 //*************************************************************************
 // clase punto
 //*************************************************************************
@@ -86,9 +88,30 @@ class _rotacion: public _objeto_ply
 {
 public:
        _rotacion();
-int  parametros(vector<_vertex3f> perfil1, int num1);
-int   parametros(char *archivo, int num);
+void  parametros(
+	vector<_vertex3f> perfil1,
+	int num,
+	eje_rot eje = Y,
+	float rad=2*M_PI
+);
+
+int   parametros(
+	char *archivo,
+	int num,
+	eje_rot eje = Y,
+	float rad=2*M_PI
+);
 
 vector<_vertex3f> perfil;
 int num;
+
+protected:
+	bool is_in_eje(_vertex3f point, eje_rot eje);
+	_vertex3f rotate_point(_vertex3f point, eje_rot eje, float theta);
+};
+
+class _esfera: public _rotacion{
+public:
+	_esfera();
+	void parametros(float r, int num, float rad=2*M_PI);
 };

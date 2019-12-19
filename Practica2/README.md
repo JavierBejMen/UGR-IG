@@ -20,6 +20,7 @@ Con esta práctica se quiere que el alumno aprenda:
 - Tecla 4: Activar cilindro
 - Tecla 5: Activar esfera
 - Tecla 6: Activar objeto PLY cargado
+- Tecla 7: Activar objeto extra
 
 ## Evaluación
 - Creación de una clase para los objetos PLY. Dado el conjunto de datos del fichero, la clase permite introducirlos según las estructuras de datos ya definidas (2 pts.).

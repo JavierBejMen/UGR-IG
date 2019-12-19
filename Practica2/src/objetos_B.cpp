@@ -6,6 +6,7 @@
 #include "file_ply_stl.hpp"
 
 
+
 //*************************************************************************
 // _puntos3D
 //*************************************************************************
@@ -225,74 +226,215 @@ _rotacion::_rotacion()
 
 }
 
-int _rotacion::parametros(char *archivo, int num){
+int _rotacion::parametros(
+	char *archivo,
+	int num,
+	eje_rot eje,
+	float rad
+){
+
 	_objeto_ply::parametros(archivo);
-	_rotacion::parametros(this->vertices, num);
+	_rotacion::parametros(this->vertices, num, eje, rad);
 
 	return 0;
 }
 
 
-int _rotacion::parametros(vector<_vertex3f> perfil, int num)
-{
+void _rotacion::parametros(
+	vector<_vertex3f> perfil,
+	int num,
+	eje_rot eje,
+	float rad
+){
+	int n_perfil = perfil.size();
 
-_vertex3f vertice_aux;
-_vertex3i cara_aux;
-int num_aux;
+	// Calcular numero de puntos en el eje y anotar cuales
+	bool point_eje[n_perfil]{false};
+	int n_point_eje = 0;
 
-// tratamiento de los vértice
+	for(int i=0; i < n_perfil; ++i){
+		if(_rotacion::is_in_eje(perfil[i], eje)){
+			point_eje[i]=true;
+			n_point_eje++;
+		}
+	}
 
-num_aux=perfil.size();
-vertices.resize(num_aux*num);
-for (int j=0;j<num;j++)
-  {for (int i=0;i<num_aux;i++)
-     {
-      vertice_aux.x=perfil[i].x*cos(2.0*M_PI*j/(1.0*num))+
-                    perfil[i].z*sin(2.0*M_PI*j/(1.0*num));
-      vertice_aux.z=-perfil[i].x*sin(2.0*M_PI*j/(1.0*num))+
-                    perfil[i].z*cos(2.0*M_PI*j/(1.0*num));
-      vertice_aux.y=perfil[i].y;
-      vertices[i+j*num_aux]=vertice_aux;
-     }
-  }
+	// Generar puntos
+	vertices.resize(n_perfil + (n_perfil-n_point_eje)*(num-1));
+	for(int i = 0; i<n_perfil; ++i){
+		vertices[i] = perfil[i];
+	}
+	int n_point_eje_below;
+	for(int i=0; i<num-1; ++i){
+		n_point_eje_below=0;
+		for(int j=0; j<n_perfil; ++j){
+			if(!point_eje[j]){
+				vertices[n_perfil + j-n_point_eje_below + i*(n_perfil-n_point_eje)] = _rotacion::rotate_point(vertices[j], eje, rad*(i+1)/(1.*num));
+			}else{
+				++n_point_eje_below;
+			}
+		}
+	}
 
-// tratamiento de las caras
-caras.resize((num)*(num_aux-1)*2);
-int nCara=0;
-for(int i=0; i < num-1; ++i){
-	for(int j=0; j<num_aux-1;++j){
-		cara_aux._0 = i*num_aux + j;
-		cara_aux._1 = (i+1)*num_aux + j;
-		cara_aux._2 = i*num_aux + j + 1;
-		this->caras[nCara++] = cara_aux;
-		cara_aux._0 = i*num_aux + j + 1;
-		cara_aux._1 = (i+1)*num_aux + j;
-		cara_aux._2 = (i+1)*num_aux + j + 1;
-		this->caras[nCara++] = cara_aux;
+	//Generar triangulos
+	int n_cara = 0;
+	int n_cara_perf = (n_perfil-1)*2;
+	if(point_eje[0]){
+		--n_cara_perf;
+	}else{
+		n_cara+=num;
+	}
+	if(point_eje[n_perfil-1]){
+		--n_cara_perf;
+	}else{
+		n_cara+=num;
+	}
+	for(int i=1; i<n_perfil-1; ++i){
+		if(point_eje[i]) n_cara_perf-=2;
+	}
+	n_cara += (num)*n_cara_perf;
+
+	//caras.resize(n_cara);
+
+	// Generamos perfiles intermedios
+	_vertex3i aux_cara;
+
+	for(int i=1; i<num-1; ++i){
+		n_point_eje_below = 0;
+		for(int j=0; j<n_perfil-1; ++j){
+			// Primer triangulo
+			if(!point_eje[j]){
+				aux_cara._0=i*(n_perfil-n_point_eje)+j-n_point_eje_below+n_point_eje;
+				aux_cara._1=(i+1)*(n_perfil-n_point_eje)+j-n_point_eje_below+n_point_eje;
+				aux_cara._2=point_eje[j+1] ? j+1 : i*(n_perfil-n_point_eje)+j-n_point_eje_below+1+n_point_eje;
+				caras.push_back(aux_cara);
+			}else{
+				++n_point_eje_below;
+			}
+
+			// Segundo triangulo
+			if(!point_eje[j+1]){
+				aux_cara._0=i*(n_perfil-n_point_eje)+j-n_point_eje_below+1+n_point_eje;
+				aux_cara._1=point_eje[j] ? j : (i+1)*(n_perfil-n_point_eje)+j-n_point_eje_below+n_point_eje;
+				aux_cara._2=(i+1)*(n_perfil-n_point_eje	)+j-n_point_eje_below+1+n_point_eje;
+				caras.push_back(aux_cara);
+			}
+		}
+	}
+
+	// Primer y ultimo Perfil
+	n_point_eje_below=0;
+	for(int j=0; j<n_perfil-1; ++j){
+		if(!point_eje[j]){
+			aux_cara._0=(num-1)*(n_perfil-n_point_eje)+j-n_point_eje_below+n_point_eje;
+			aux_cara._1=j;
+			aux_cara._2=point_eje[j+1] ? j+1 : (num-1)*(n_perfil-n_point_eje)+j-n_point_eje_below+1+n_point_eje;
+			caras.push_back(aux_cara);
+		}else{
+			++n_point_eje_below;
+		}
+		if(!point_eje[j+1]){
+			aux_cara._0=(num-1)*(n_perfil-n_point_eje)+j-n_point_eje_below+1+n_point_eje;
+			aux_cara._1=j;
+			aux_cara._2=j+1;
+			caras.push_back(aux_cara);
+		}
+	}
+	n_point_eje_below=0;
+	for(int j=0; j<n_perfil-1; ++j){
+		if(!point_eje[j]){
+			aux_cara._0=j;
+			aux_cara._1=(n_perfil)+j-n_point_eje_below;
+			aux_cara._2=j+1;
+			caras.push_back(aux_cara);
+		}else{
+			n_point_eje_below++;
+		}
+		if(!point_eje[j+1]){
+			aux_cara._0=j+1;
+			aux_cara._1=point_eje[j] ? j : (n_perfil)+j-n_point_eje_below;
+			aux_cara._2=(n_perfil)+j-n_point_eje_below+1;
+			caras.push_back(aux_cara);
+		}
+	}
+
+	// Tapas
+	if(!point_eje[0]){
+		for(int i=1; i<num-2; ++i){
+			aux_cara._0=0;
+			aux_cara._1=n_perfil+(i-1)*(n_perfil-n_point_eje);
+			aux_cara._2=n_perfil+(i)*(n_perfil-n_point_eje);
+			caras.push_back(aux_cara);
+		}
+	}
+
+	if(!point_eje[n_perfil-1]){
+		for(int i=1; i<num-2; ++i){
+			aux_cara._0=n_perfil-1;
+			aux_cara._1=2*n_perfil-1+(i-1)*(n_perfil-n_point_eje);
+			aux_cara._2=2*n_perfil-1+(i)*(n_perfil-n_point_eje);
+			caras.push_back(aux_cara);
+		}
 	}
 }
-// Ultimo perfil con el primero
-for(int j=0; j<num_aux-1;++j){
-	cara_aux._0 = (num-1)*num_aux + j;
-	cara_aux._1 = j;
-	cara_aux._2 = (num-1)*num_aux + j + 1;
-	this->caras[nCara++] = cara_aux;
-	cara_aux._0 = (num-1)*num_aux + j + 1;
-	cara_aux._1 = j;
-	cara_aux._2 = j + 1;
-	this->caras[nCara++] = cara_aux;
+
+bool _rotacion::is_in_eje(_vertex3f point, eje_rot eje){
+	switch(eje){
+		case X:
+			return point.y==0;
+		case Y:
+			return point.x==0;
+		case Z:
+			return point.x==0 && point.y==0;
+		default:
+			return false;
+	}
 }
 
+_vertex3f _rotacion::rotate_point(_vertex3f point, eje_rot eje, float theta){
+	_vertex3f r_point;
+	switch (eje) {
+		case X:
+			r_point.x = point.x;
+			r_point.y = point.y*cos(theta)-point.z*sin(theta);
+			r_point.z = point.y*sin(theta)+point.z*cos(theta);
+			return r_point;
+		case Y:
+			r_point.x = point.x*cos(theta)+point.z*sin(theta);
+			r_point.y=point.y;
+			r_point.z = -1*(point.x*sin(theta))+point.z*cos(theta);
+			return r_point;
+		case Z:
+			r_point.x=point.x*cos(theta)-point.y*sin(theta);
+			r_point.y=point.x*sin(theta)+point.y*cos(theta);
+			r_point.z = point.z;
+			return r_point;
+		default:
+			return {.0,.0,.0};
+	}
+}
 
- // tapa inferior
-if (fabs(perfil[0].x)>0.0)
-  {
-  }
+//************************************************************************
+// esfera
+//************************************************************************
 
- // tapa superior
- if (fabs(perfil[num_aux-1].x)>0.0)
-  {
-  }
+_esfera::_esfera(){}
 
-	return 0;
+void _esfera::parametros(float r, int num, float rad){
+	// Generamos perfil
+	_vertex3f point = {0.,-r,0.};
+	vertices.resize(30);
+	vertices[0]=point;
+	for(int i=0; i<28; ++i){
+		vertices[i+1]=rotate_point(point, Z, M_PI*(i+1)/(1.*28));
+	}
+	_vertex3f last_point= {0.,r,0.};
+	vertices[29] = last_point;
+
+	for(int i=0; i<vertices.size(); ++i){
+		cout<<vertices[i].x<<","<<vertices[i].y<<","<<vertices[i].z<<endl;
+	}
+
+	// Generamos esfera por rotacion
+	_rotacion::parametros(this->vertices, num, Y, rad);
 }
