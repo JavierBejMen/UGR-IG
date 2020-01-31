@@ -13,6 +13,7 @@
 #include "objetos_B.h"
 #include <iostream>
 #include <algorithm>
+#include "Mano.hpp"
 
 
 // tamaño de los ejes
@@ -35,6 +36,8 @@ _cubo cubo(0.2);
 _objeto_ply  ply;
 _rotacion cono, cilindro, prueba;
 _esfera esfera;
+Dedo dedo;
+
 
 // Variables de control
 _triangulos3D *current_object = &piramide;
@@ -185,7 +188,7 @@ if (Tecla1=='3') current_object = &cono;
 if (Tecla1=='4') current_object = &cilindro;
 if (Tecla1=='5') current_object = &esfera;
 if (Tecla1=='6') current_object = &ply;
-if (Tecla1=='7') current_object = &prueba;
+if (Tecla1=='7') current_object = &dedo;
 
 glutPostRedisplay();
 }

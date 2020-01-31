@@ -1,7 +1,8 @@
 //**************************************************************************
 // Práctica 1 usando objetos
 //**************************************************************************
-
+#ifndef __OBJETOS_H__
+#define __OBJETOS_H__
 #include <vector>
 #include <GL/gl.h>
 #include "vertex.h"
@@ -110,8 +111,14 @@ protected:
 	_vertex3f rotate_point(_vertex3f point, eje_rot eje, float theta);
 };
 
+//************************************************************************
+// esfera
+//************************************************************************
+
 class _esfera: public _rotacion{
 public:
 	_esfera();
 	void parametros(float r, int num, float rad=2*M_PI);
 };
+
+#endif

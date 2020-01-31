@@ -1149,7 +1149,7 @@ _vertex3<Type>::show_values()
 
 template <class Type> _vertex4<Type>::_vertex4(Type x1,Type y1,Type z1,Type w1)
 {
-  
+
 x=x1;
 y=y1;
 z=z1;
@@ -1695,14 +1695,14 @@ return(Normal1);
 // template <> inline void
 // _plane<float>::show_values()
 // {
-// 
+//
 // printf("plane: x=%f y=%f z=%f w=%f\n",x,y,z,w);
 // }
-// 
+//
 // template <> inline void
 // _plane<double>::show_values()
 // {
-// 
+//
 // printf("plane: x=%lf y=%lf z=%lf w=%lf\n",x,y,z,w);
 // }
 
