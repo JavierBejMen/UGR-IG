@@ -33,7 +33,7 @@ public:
     float r2, float g2, float b2, float grosor) override;
 
 private:
-  _rotacion string;
+  _rotacion string, hook_0, hook_1, hook_2;
 };
 
 class Heli: public _triangulos3D {
