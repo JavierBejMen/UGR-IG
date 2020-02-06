@@ -13,7 +13,7 @@
 #include "objetos_B.h"
 #include <iostream>
 #include <algorithm>
-#include "Mano.hpp"
+#include "Heli.hpp"
 
 
 // tamaño de los ejes
@@ -36,12 +36,13 @@ _cubo cubo(0.2);
 _objeto_ply  ply;
 _rotacion cono, cilindro, prueba;
 _esfera esfera;
-Dedo dedo;
+Heli helicopter;
+
 
 
 // Variables de control
 _triangulos3D *current_object = &piramide;
-int draw_mode = 0;
+_modo draw_mode = POINTS;
 
 //**************************************************************************
 //
@@ -113,21 +114,7 @@ glEnd();
 
 void draw_objects()
 {
-  switch (draw_mode) {
-    case 0:
-      current_object->draw_puntos(1.,.5,.0,3);
-      break;
-    case 1:
-      current_object->draw_aristas(1.0,0.5,0.0,3);
-      break;
-    case 2:
-      current_object->draw_solido(1.0,0.5,0.0);
-      break;
-    case 3:
-      current_object->draw_solido_ajedrez(1.0,0.5,0.0,.0,.5,1.);
-    default:
-      break;
-  }
+  current_object->draw(draw_mode, 1.0,0.5,0.0,.0,.5,1.,1);
 }
 
 
@@ -178,17 +165,17 @@ void normal_keys(unsigned char Tecla1,int x,int y)
 {
 
 if (toupper(Tecla1)=='Q') exit(0);
-if (toupper(Tecla1)=='P') draw_mode=0;
-if (toupper(Tecla1)=='L') draw_mode=1;
-if (toupper(Tecla1)=='F') draw_mode=2;
-if (toupper(Tecla1)=='C') draw_mode=3;
+if (toupper(Tecla1)=='P') draw_mode=POINTS;
+if (toupper(Tecla1)=='L') draw_mode=EDGES;
+if (toupper(Tecla1)=='F') draw_mode=SOLID;
+if (toupper(Tecla1)=='C') draw_mode=SOLID_CHESS;
 if (Tecla1=='1') current_object = &piramide;
 if (Tecla1=='2') current_object = &cubo;
 if (Tecla1=='3') current_object = &cono;
 if (Tecla1=='4') current_object = &cilindro;
 if (Tecla1=='5') current_object = &esfera;
 if (Tecla1=='6') current_object = &ply;
-if (Tecla1=='7') current_object = &dedo;
+if (Tecla1=='7') current_object = &helicopter;
 
 glutPostRedisplay();
 }

@@ -102,6 +102,21 @@ void _triangulos3D::draw_solido_ajedrez(float r1, float g1, float b1, float r2, 
 	glEnd();
 }
 
+//*************************************************************************
+// dibujar
+//*************************************************************************
+
+
+void _triangulos3D::draw(_modo modo, float r1, float g1, float b1, float r2, float g2, float b2, float grosor)
+{
+switch (modo){
+	case POINTS:draw_puntos(r1, g1, b1, grosor);break;
+	case EDGES:draw_aristas(r1, g1, b1, grosor);break;
+	case SOLID_CHESS:draw_solido_ajedrez(r1, g1, b1, r2, g2, b2);break;
+	case SOLID:draw_solido(r1, g1, b1);break;
+	}
+}
+
 
 
 //*************************************************************************
