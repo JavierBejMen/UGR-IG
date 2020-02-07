@@ -14,6 +14,8 @@
 #include <iostream>
 #include <algorithm>
 #include "Heli.hpp"
+#include "vertex.h"
+#include "Robot.hpp"
 
 
 // tamaño de los ejes
@@ -36,13 +38,24 @@ _cubo cubo(0.2);
 _objeto_ply  ply;
 _rotacion cono, cilindro, prueba;
 _esfera esfera;
-Heli helicopter;
+Robot robot;
 
 
 
 // Variables de control
 _triangulos3D *current_object = &piramide;
 _modo draw_mode = POINTS;
+bool animation = false;
+
+//Robot controls
+
+
+void funcion_idle(){
+  if(animation){
+    //helicopter.update(movement, throttle, rotation);
+    //glutPostRedisplay();
+  }
+}
 
 //**************************************************************************
 //
@@ -175,7 +188,24 @@ if (Tecla1=='3') current_object = &cono;
 if (Tecla1=='4') current_object = &cilindro;
 if (Tecla1=='5') current_object = &esfera;
 if (Tecla1=='6') current_object = &ply;
-if (Tecla1=='7') current_object = &helicopter;
+if (Tecla1=='7') current_object = &robot;
+if(toupper(Tecla1)=='A') animation=!animation;
+if(toupper(Tecla1)=='W'){
+  robot.position.x-=robot.velocity;
+  robot.wheel_angle_z+=robot.velocity*30;
+}
+if(toupper(Tecla1)=='E'){
+  robot.position.x+=robot.velocity;
+  robot.wheel_angle_z-=robot.velocity*30;
+}
+if(toupper(Tecla1)=='R'){
+  robot.position.z-=robot.velocity;
+  robot.wheel_angle_x-=robot.velocity*30;
+}
+if(toupper(Tecla1)=='T'){
+  robot.position.z+=robot.velocity;
+  robot.wheel_angle_x+=robot.velocity*30;
+}
 
 glutPostRedisplay();
 }
@@ -276,6 +306,8 @@ int main(int argc, char **argv)
     glutKeyboardFunc(normal_keys);
     // asignación de la funcion llamada "tecla_Especial" al evento correspondiente
     glutSpecialFunc(special_keys);
+    //idle function
+    glutIdleFunc(funcion_idle);
 
     // funcion de inicialización
     initialize();

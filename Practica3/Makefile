@@ -22,7 +22,7 @@ endif
 GLFLAGS = -lGL -lGLU -lglut
 
 MAINDEPENDENCIES = $(OBJ)/objetos_B.o $(OBJ)/main.o $(OBJ)/file_ply_stl.o \
-$(OBJ)/Heli.o
+$(OBJ)/Robot.o
 
 TARGETS = clean $(BIN)/main
 
@@ -40,7 +40,7 @@ $(OBJ)/objetos_B.o: $(SRC)/objetos_B.cpp
 $(OBJ)/file_ply_stl.o: $(SRC)/file_ply_stl.cpp
 	$(CC) $(CCFLAGS) -c -o $@ $^ -I$(INCLUDE)
 
-$(OBJ)/Heli.o: $(SRC)/Heli.cpp
+$(OBJ)/Robot.o: $(SRC)/Robot.cpp
 	$(CC) $(CCFLAGS) -c -o $@ $^ -I$(INCLUDE)
 
 
