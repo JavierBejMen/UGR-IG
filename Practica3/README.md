@@ -13,6 +13,7 @@ Con esta práctica se quiere que el alumno aprenda:
 
 
 ## Mapeo de teclas
+. Tecla Q: Quitar
 - Tecla p: Visualizar en modo puntos
 - Tecla l: Visualizar en modo líneas/aristas
 - Tecla f: Visualizar en modo relleno
@@ -25,10 +26,14 @@ Con esta práctica se quiere que el alumno aprenda:
 - Tecla 6: Activar objeto PLY cargado
 - Tecla 7: Activar objeto jerárquico
 - Tecla A: Activar/desactivar la animación
-- Teclas Q/W: modifica primer grado de libertad del modelo jerárquico (aumenta/disminuye)
-- Teclas S/D: modifica segundo grado de libertad del modelo jerárquico (aumenta/disminuye)
-- Teclas Z/X: modifica tercer grado de libertad del modelo jerárquico (aumenta/disminuye)
-- Tecla E/R: incrementar/decrementar la velocidad de modificación del primer grado de libertad del modelo jerárquico
+- Teclas W/E: Primer grado de libertad
+- Teclas R/T: Segundo grado de libertad
+- Teclas Y/U: Tercer grado de libertad
+- Teclas I/O: Cuarto grado de libertad
+- Teclas G/H: Quinto grado de libertad
+- Teclas J/K: Sexto grado de libertad
+- Teclas Z/X: Velocidad para el primer y segundo grado de libertad;
+- Teclas B/N: Velocidad para el tercer grado de libertad;
 
 ## Evaluación
 - Creación del modelo jerárquico y las clases correspondientes con al menos con 5 niveles y 3 grados de libertad, incluyendo giros y traslaciones. (5 puntos)

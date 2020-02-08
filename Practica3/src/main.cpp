@@ -16,7 +16,7 @@
 #include "vertex.h"
 #include "Robot.hpp"
 
-
+using namespace std;
 // tamaño de los ejes
 
 
@@ -207,12 +207,16 @@ if(toupper(Tecla1)=='T'){
 }
 if(toupper(Tecla1)=='Y') robot.chasis_angle+=robot.chasis_velocity;
 if(toupper(Tecla1)=='U') robot.chasis_angle-=robot.chasis_velocity;
-if(toupper(Tecla1)=='I') robot.h_dplcmnt+=0.1;
-if(toupper(Tecla1)=='O') robot.h_dplcmnt-=0.1;
-if(toupper(Tecla1)=='G') robot.string_length+=0.1;
-if(toupper(Tecla1)=='H') robot.string_length-=0.1;
+if(toupper(Tecla1)=='I') robot.h_dplcmnt=min(robot.h_dplcmnt+0.1,2.);
+if(toupper(Tecla1)=='O') robot.h_dplcmnt=max(robot.h_dplcmnt-0.1,-1.1);
+if(toupper(Tecla1)=='G') robot.string_length=min(robot.string_length+0.1,3.);
+if(toupper(Tecla1)=='H') robot.string_length=max(robot.string_length-0.1,0.5);
 if(toupper(Tecla1)=='J') robot.ball_angle+=0.5;
 if(toupper(Tecla1)=='K') robot.ball_angle-=0.5;
+if(toupper(Tecla1)=='Z') robot.velocity=min(robot.velocity+0.01, 0.2);
+if(toupper(Tecla1)=='X') robot.velocity=max(robot.velocity-0.01, 0.01);
+if(toupper(Tecla1)=='B') robot.chasis_velocity=min(robot.chasis_velocity+1, (float)5);
+if(toupper(Tecla1)=='N') robot.chasis_velocity=max(robot.chasis_velocity-1, (float)1);
 
 glutPostRedisplay();
 }
