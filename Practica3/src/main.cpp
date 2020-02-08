@@ -15,9 +15,11 @@
 #include <algorithm>
 #include "vertex.h"
 #include "Robot.hpp"
+#include <stdlib.h>
 
 using namespace std;
 // tamaño de los ejes
+
 
 
 // variables que definen la posicion de la camara en coordenadas polares
@@ -45,15 +47,52 @@ Robot robot;
 _triangulos3D *current_object = &piramide;
 _modo draw_mode = POINTS;
 bool animation = false;
+bool ball_dir=true, h_dir=true, x_dir=true, z_dir=true;
+int x_max,x_min,z_max,z_min;
 
-//Robot controls
+
 
 
 void funcion_idle(){
-  if(animation){
-    //helicopter.update(movement, throttle, rotation);
-    //glutPostRedisplay();
+
+  if(ball_dir){
+    robot.ball_angle+=0.1;
+    if(robot.ball_angle>75)ball_dir=false;
+  }else{
+    robot.ball_angle-=0.1;
+    if(robot.ball_angle<-75)ball_dir=true;
   }
+
+  if(h_dir){
+    robot.h_dplcmnt+=0.0001;
+    if(robot.h_dplcmnt>=2)h_dir=false;
+  }else{
+    robot.h_dplcmnt-=0.001;
+    if(robot.h_dplcmnt<=-1.1)h_dir=true;
+  }
+
+  if(x_dir){
+    robot.position.x-=0.001;
+    robot.wheel_angle_z+=0.03;
+    if(robot.position.x<=x_min)x_dir=false;
+  }else{
+    robot.position.x+=0.001;
+    robot.wheel_angle_z-=0.03;
+    if(robot.position.x>=x_max)x_dir=true;
+  }
+
+  if(z_dir){
+    robot.position.z-=0.001;
+    robot.wheel_angle_x-=0.03;
+    if(robot.position.z<=z_min)z_dir=false;
+  }else{
+    robot.position.z+=0.001;
+    robot.wheel_angle_x+=0.03;
+    if(robot.position.z>=z_max)z_dir=true;
+  }
+
+
+  glutPostRedisplay();
 }
 
 //**************************************************************************
@@ -188,7 +227,16 @@ if (Tecla1=='4') current_object = &cilindro;
 if (Tecla1=='5') current_object = &esfera;
 if (Tecla1=='6') current_object = &ply;
 if (Tecla1=='7') current_object = &robot;
-if(toupper(Tecla1)=='A') animation=!animation;
+if(toupper(Tecla1)=='A'){
+  if(!animation){
+    //idle function
+    glutIdleFunc(funcion_idle);
+    animation=true;
+  }else{
+    animation=false;
+    glutIdleFunc(NULL);
+  }
+}
 if(toupper(Tecla1)=='W'){
   robot.position.x-=robot.velocity;
   robot.wheel_angle_z+=robot.velocity*30;
@@ -284,6 +332,12 @@ glViewport(0,0,UI_window_width,UI_window_height);
 
 int main(int argc, char **argv)
 {
+    srand (time(NULL));
+
+    x_max=rand()%10;
+    x_min=-(rand()%10);
+    z_max=rand()%10;
+    z_min=-(rand()%10);
     // se llama a la inicialización de glut
 
     glutInit(&argc, argv);
@@ -317,8 +371,6 @@ int main(int argc, char **argv)
     glutKeyboardFunc(normal_keys);
     // asignación de la funcion llamada "tecla_Especial" al evento correspondiente
     glutSpecialFunc(special_keys);
-    //idle function
-    glutIdleFunc(funcion_idle);
 
     // funcion de inicialización
     initialize();
