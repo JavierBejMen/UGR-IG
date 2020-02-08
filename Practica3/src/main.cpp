@@ -13,7 +13,6 @@
 #include "objetos_B.h"
 #include <iostream>
 #include <algorithm>
-#include "Heli.hpp"
 #include "vertex.h"
 #include "Robot.hpp"
 
@@ -206,6 +205,14 @@ if(toupper(Tecla1)=='T'){
   robot.position.z+=robot.velocity;
   robot.wheel_angle_x+=robot.velocity*30;
 }
+if(toupper(Tecla1)=='Y') robot.chasis_angle+=robot.chasis_velocity;
+if(toupper(Tecla1)=='U') robot.chasis_angle-=robot.chasis_velocity;
+if(toupper(Tecla1)=='I') robot.h_dplcmnt+=0.1;
+if(toupper(Tecla1)=='O') robot.h_dplcmnt-=0.1;
+if(toupper(Tecla1)=='G') robot.string_length+=0.1;
+if(toupper(Tecla1)=='H') robot.string_length-=0.1;
+if(toupper(Tecla1)=='J') robot.ball_angle+=0.5;
+if(toupper(Tecla1)=='K') robot.ball_angle-=0.5;
 
 glutPostRedisplay();
 }

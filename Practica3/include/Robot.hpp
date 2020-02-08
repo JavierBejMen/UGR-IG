@@ -15,16 +15,16 @@ private:
   _esfera upper;
 };
 
-//Horizontal support
-class Hsupport: _triangulos3D{
+//Vertical support
+class Vsupport: _triangulos3D{
 public:
-  Hsupport();
+  Vsupport();
   void 	draw(_modo modo, float r1, float g1, float b1,
     float r2, float g2, float b2, float grosor) override;
 
 private:
   _rotacion rod;
-  _cubo h_support;
+  _cubo v_support;
 };
 
 //Robot
@@ -35,16 +35,17 @@ public:
     float r2, float g2, float b2, float grosor) override;
 
   _vertex3f position;
-  float velocity, wheel_angle_z, wheel_angle_x;
+  float velocity, wheel_angle_z, wheel_angle_x, chasis_angle, chasis_velocity;
+  float h_dplcmnt, string_length, ball_angle;
 
 private:
   _esfera wheel;
   Chasis chasis;
-  _cubo v_support;
-  Hsupport h_support;
+  _cubo h_support;
+  Vsupport v_support;
   _esfera ball;
   _rotacion string;
-  float v_s_height, h_s_lenght, string_length;
+  float h_s_lenght;
 
 };
 
