@@ -26,7 +26,7 @@ int estadoRaton[3], xc, yc, modo[5], cambio=0;
 int Ancho=450, Alto=450;
 float factor=1.0;
 
-void pick_color(int x, int y);
+void pick(int x, int y);
 
 
 
@@ -440,7 +440,7 @@ if(boton== GLUT_LEFT_BUTTON) {
       estadoRaton[2] = 2;
       xc=x;
       yc=y;
-      pick_color(xc, yc);
+      pick(xc, yc);
     }
   }
 }
@@ -479,18 +479,86 @@ if(estadoRaton[2]==1)
     }
 }
 
-void pick_color(int x, int y)
+/*************************************************************************/
+// Hit process
+/*************************************************************************/
+void hits_process(GLint hits, GLuint *names ){
+  cout << "Hits: " << hits << endl;
+
+	for (int i = 0; i < hits; i++)
+	{
+		cout << "Numero: " << names[i * 4] << endl;
+
+		cout << "Min Z: " << names[i * 4 + 1] << endl;
+		cout << "Max Z: " << names[i * 4 + 2] << endl;
+		cout << "Nombre en la pila: " << names[i * 4 + 3] << endl;
+
+    current_object->alt_triangle_color[names[i * 4 + 3]]=!
+      current_object->alt_triangle_color[names[i * 4 + 3]];
+	}
+
+	cout << endl;
+
+
+
+}
+
+/*************************************************************************/
+
+void pick(int x, int y)
 {
+  //Viweport
   GLint viewport[4];
-unsigned char pixel[3];
+  glGetIntegerv(GL_VIEWPORT, viewport);
 
-glGetIntegerv(GL_VIEWPORT, viewport);
-glReadBuffer(GL_BACK);
-glReadPixels(x,viewport[3]-y,1,1,GL_RGB,GL_UNSIGNED_BYTE,(GLubyte *) &pixel[0]);
-printf(" valor x %d, valor y %d, color %d, %d, %d \n",x,y,pixel[0],pixel[1],pixel[2]);
+  //Seleccionamos buffer
+  GLuint buffer[100];
+  glSelectBuffer(100, buffer);
 
-//procesar_color(pixel);
-glutPostRedisplay();
+  //Entramos en modo seleccion
+  glRenderMode(GL_SELECT);
+
+  //Inicializar pila de nombres
+  glInitNames();
+  glPushName(0);
+
+  //Matriz de seleccion
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPickMatrix(x, viewport[3]-y, 1, 1, viewport);
+  glFrustum(-Window_width, Window_width, -Window_height, Window_height, Front_plane, Back_plane);
+
+
+  //Dibujar escena
+  _modo prev_mode = draw_mode;
+  draw_mode = SELECT;
+  draw_scene();
+  draw_mode = prev_mode;
+
+  // Pasar OpenGL a modo render
+  int hits = glRenderMode(GL_RENDER);
+
+  // Restablecer la transformación de proyección
+  change_projection(camera_mode);
+
+  // Analizar el contenido del buffer de selección
+  hits_process(hits, buffer);
+  //names = selectBuf;
+
+  // Dibujar la escena
+  draw_scene();
+  /*
+  GLint viewport[4];
+  unsigned char pixel[3];
+
+  glGetIntegerv(GL_VIEWPORT, viewport);
+  glReadBuffer(GL_BACK);
+  glReadPixels(x,viewport[3]-y,1,1,GL_RGB,GL_UNSIGNED_BYTE,(GLubyte *) &pixel[0]);
+  printf(" valor x %d, valor y %d, color %d, %d, %d \n",x,y,pixel[0],pixel[1],pixel[2]);
+
+  //procesar_color(pixel);
+  glutPostRedisplay();
+  */
 }
 
 

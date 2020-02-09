@@ -52,9 +52,11 @@ void _triangulos3D::draw_aristas(float r, float g, float b, int grosor)
 int i;
 glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 glLineWidth(grosor);
-glColor3f(r,g,b);
 glBegin(GL_TRIANGLES);
 for (i=0;i<caras.size();i++){
+	if(alt_triangle_color[i]){
+		glColor3f(1,0,0);
+	}else{glColor3f(r,g,b);}
 	glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
 	glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
 	glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
@@ -71,9 +73,11 @@ glEnd();
 void _triangulos3D::draw_solido(float r, float g, float b)
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glColor3f(r, g, b);
 	glBegin(GL_TRIANGLES);
 	for (int i=0;i<caras.size();i++){
+		if(alt_triangle_color[i]){
+			glColor3f(1,0,0);
+		}else{glColor3f(r,g,b);}
 		glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
 		glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
 		glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
@@ -90,11 +94,11 @@ void _triangulos3D::draw_solido_ajedrez(float r1, float g1, float b1, float r2, 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBegin(GL_TRIANGLES);
 	for (int i=0;i<caras.size();i++){
-		if(i%2 == 0){
+		if(i%2 == 0 && !alt_triangle_color[i]){
 			glColor3f(r1, g1, b1);
-		}else{
+		}else if(!alt_triangle_color[i]){
 			glColor3f(r2, g2, b2);
-		}
+		}else glColor3f(1,0,0);
 		glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
 		glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
 		glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
@@ -121,6 +125,7 @@ switch (modo){
 	case SOLID:draw_solido(r1, g1, b1);break;
 	case FLAT:draw_iluminacion_plana();break;
 	case SMOOTH:draw_iluminacion_suave();break;
+	case SELECT:draw_selection();break;
 	}
 }
 
@@ -132,6 +137,7 @@ void _triangulos3D::draw_iluminacion_plana(){
 	glEnable(GL_LIGHTING);
 	glEnable(GL_NORMALIZE);
 
+	_vertex4f alt = {1,0,0,1};
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat *) &ambiente_difusa);
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &ambiente_difusa);
   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo);
@@ -139,7 +145,13 @@ void _triangulos3D::draw_iluminacion_plana(){
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glBegin(GL_TRIANGLES);
 	for (int i=0;i<caras.size();i++){
-
+		if(alt_triangle_color[i]){
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE,(GLfloat *) &alt);
+		  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &alt);
+		}else{
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat *) &ambiente_difusa);
+		  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &ambiente_difusa);
+		}
 		glNormal3fv((GLfloat *) &normales_caras[i]);
 
 		glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
@@ -160,6 +172,8 @@ void _triangulos3D::draw_iluminacion_suave(){
 	glEnable(GL_LIGHTING);
 	glEnable(GL_NORMALIZE);
 
+	_vertex4f alt = {1,0,0,1};
+
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat *) &ambiente_difusa);
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &ambiente_difusa);
   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, brillo);
@@ -167,7 +181,13 @@ void _triangulos3D::draw_iluminacion_suave(){
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glBegin(GL_TRIANGLES);
 	for (int i=0;i<caras.size();i++){
-
+		if(alt_triangle_color[i]){
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE,(GLfloat *) &alt);
+		  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &alt);
+		}else{
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat *) &ambiente_difusa);
+		  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (GLfloat *) &ambiente_difusa);
+		}
 		glNormal3fv((GLfloat *) &normales_vertices[caras[i]._0]);
 		glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
 
@@ -181,6 +201,24 @@ void _triangulos3D::draw_iluminacion_suave(){
 	glDisable(GL_SMOOTH);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_NORMALIZE);
+}
+
+//*************************************************************************
+// dibujar en select mode
+//*************************************************************************
+void _triangulos3D::draw_selection(){
+	glPolygonMode(GL_FRONT, GL_FILL);
+
+	for (int i=0;i<caras.size();i++){
+		glLoadName(i+1);
+		glBegin(GL_TRIANGLES);
+		glNormal3fv((GLfloat *) &normales_caras[i]);
+		glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
+		glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
+		glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
+		glEnd();
+		}
+
 }
 
 
@@ -284,6 +322,7 @@ caras[11]._0=5;caras[11]._1=3;caras[11]._2=7;
 
 calcular_normales_caras();
 calcular_normales_vertices();
+alt_triangle_color.resize(caras.size());for(int i=0;i<caras.size();++i){alt_triangle_color[i]=false;}
 }
 
 
@@ -312,6 +351,7 @@ caras[5]._0=3;caras[5]._1=2;caras[5]._2=1;
 
 calcular_normales_caras();
 calcular_normales_vertices();
+alt_triangle_color.resize(caras.size());for(int i=0;i<caras.size();++i){alt_triangle_color[i]=false;}
 }
 
 //*************************************************************************
@@ -362,6 +402,7 @@ for(i=0; i < n_car; ++i){
 
 	calcular_normales_caras();
 	calcular_normales_vertices();
+	alt_triangle_color.resize(caras.size());for(int i=0;i<caras.size();++i){alt_triangle_color[i]=false;}
 return(0);
 }
 
@@ -387,6 +428,7 @@ int _rotacion::parametros(
 
 	calcular_normales_caras();
 	calcular_normales_vertices();
+	alt_triangle_color.resize(caras.size());for(int i=0;i<caras.size();++i){alt_triangle_color[i]=false;}
 	return 0;
 }
 
@@ -597,4 +639,5 @@ void _esfera::parametros(float r, int num, float rad){
 
 	calcular_normales_caras();
 	calcular_normales_vertices();
+	alt_triangle_color.resize(caras.size());for(int i=0;i<caras.size();++i){alt_triangle_color[i]=false;}
 }
