@@ -11,6 +11,9 @@ class Texture{
 public:
   void prepara_textura (char *file, GLuint *tex_id );
   void libera_textura (GLuint *tex_id);
+
+private:
+
 };
 
 #endif
