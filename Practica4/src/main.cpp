@@ -380,7 +380,7 @@ int main(int argc, char **argv)
     cono.parametros("data/cono", 40);
     cilindro.parametros("data/cilindro", 40);
     prueba.parametros("data/prueba", 20, Z, 2*M_PI*0.75);
-    esfera.parametros(0.5, 40);
+    esfera.parametros(0.5, 3);
 
     // inicio del bucle de eventos
     glutMainLoop();

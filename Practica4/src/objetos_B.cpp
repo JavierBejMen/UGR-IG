@@ -23,7 +23,7 @@ _puntos3D::_puntos3D()
 void _puntos3D::draw_puntos(float r, float g, float b, int grosor)
 {
 int i;
-glPointSize(grosor);
+glPointSize(3);
 glColor3f(r,g,b);
 glBegin(GL_POINTS);
 for (i=0;i<vertices.size();i++){
@@ -70,10 +70,11 @@ glEnd();
 
 void _triangulos3D::draw_solido(float r, float g, float b)
 {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT, GL_FILL);
 	glColor3f(r, g, b);
 	glBegin(GL_TRIANGLES);
 	for (int i=0;i<caras.size();i++){
+		glNormal3fv((GLfloat *) &normales_caras[i]);
 		glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
 		glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
 		glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
@@ -87,7 +88,7 @@ void _triangulos3D::draw_solido(float r, float g, float b)
 
 void _triangulos3D::draw_solido_ajedrez(float r1, float g1, float b1, float r2, float g2, float b2)
 {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT, GL_FILL);
 	glBegin(GL_TRIANGLES);
 	for (int i=0;i<caras.size();i++){
 		if(i%2 == 0){
@@ -95,6 +96,7 @@ void _triangulos3D::draw_solido_ajedrez(float r1, float g1, float b1, float r2, 
 		}else{
 			glColor3f(r2, g2, b2);
 		}
+		glNormal3fv((GLfloat *) &normales_caras[i]);
 		glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
 		glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
 		glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
@@ -117,7 +119,25 @@ switch (modo){
 	}
 }
 
+//*************************************************************************
+// Normales
+//*************************************************************************
+void _triangulos3D::calcular_normales_caras(){
+	_vertex3f a,b;
+	_vertex3f normal;
+	normales_caras.resize(caras.size());
+	for(int i=0; i < caras.size(); ++i){
+		a = vertices[caras[i]._1]-vertices[caras[i]._0];
+		b = vertices[caras[i]._2]-vertices[caras[i]._0];
 
+		normal = a.cross_product(b);
+		normales_caras[i] = normal;
+	}
+}
+
+void _triangulos3D::calcular_normales_vertices(){
+
+}
 
 //*************************************************************************
 // clase cubo
@@ -138,8 +158,8 @@ vertices[7].x=tam;vertices[7].y=tam;vertices[7].z=-tam;
 
 // triangulos
 caras.resize(12);
-caras[0]._0=0;caras[0]._1=1;caras[0]._2=2;
-caras[1]._0=2;caras[1]._1=1;caras[1]._2=3;
+caras[0]._0=0;caras[0]._1=2;caras[0]._2=1;
+caras[1]._0=2;caras[1]._1=3;caras[1]._2=1;
 
 caras[2]._0=4;caras[2]._1=5;caras[2]._2=6;
 caras[3]._0=6;caras[3]._1=5;caras[3]._2=7;
@@ -155,6 +175,8 @@ caras[9]._0=6;caras[9]._1=0;caras[9]._2=4;
 
 caras[10]._0=1;caras[10]._1=3;caras[10]._2=5;
 caras[11]._0=5;caras[11]._1=3;caras[11]._2=7;
+
+calcular_normales_caras();
 }
 
 
@@ -180,6 +202,8 @@ caras[2]._0=2;caras[2]._1=3;caras[2]._2=4;
 caras[3]._0=3;caras[3]._1=0;caras[3]._2=4;
 caras[4]._0=3;caras[4]._1=1;caras[4]._2=0;
 caras[5]._0=3;caras[5]._1=2;caras[5]._2=1;
+
+calcular_normales_caras();
 }
 
 //*************************************************************************
@@ -228,6 +252,7 @@ for(i=0; i < n_car; ++i){
 	caras[i]._2 = car_ply[j++];
 }
 
+calcular_normales_caras();
 return(0);
 }
 
@@ -251,6 +276,7 @@ int _rotacion::parametros(
 	_objeto_ply::parametros(archivo);
 	_rotacion::parametros(this->vertices, num, eje, rad);
 
+	calcular_normales_caras();
 	return 0;
 }
 
@@ -377,8 +403,8 @@ void _rotacion::parametros(
 	if(!point_eje[0]){
 		for(int i=1; i<num-2; ++i){
 			aux_cara._0=0;
-			aux_cara._1=n_perfil+(i-1)*(n_perfil-n_point_eje);
-			aux_cara._2=n_perfil+(i)*(n_perfil-n_point_eje);
+			aux_cara._2=n_perfil+(i-1)*(n_perfil-n_point_eje);
+			aux_cara._1=n_perfil+(i)*(n_perfil-n_point_eje);
 			caras.push_back(aux_cara);
 		}
 	}
@@ -437,19 +463,27 @@ _esfera::_esfera(){}
 
 void _esfera::parametros(float r, int num, float rad){
 	// Generamos perfil
+	vector<_vertex3f> perfil;
 	_vertex3f point = {0.,-r,0.};
-	vertices.resize(30);
-	vertices[0]=point;
+	perfil.resize(30);
+	perfil[0]=point;
+	_vertex3f middle_point = {r,0.,0.};
+	perfil[15] = middle_point;
 	for(int i=0; i<28; ++i){
-		vertices[i+1]=rotate_point(point, Z, M_PI*(i+1)/(1.*28));
+		if((i+1)!=15){
+			perfil[i+1]=rotate_point(point, Z, M_PI*(i+1)/(1.*30));
+		}
+
 	}
 	_vertex3f last_point= {0.,r,0.};
-	vertices[29] = last_point;
+	perfil[29] = last_point;
 
-	for(int i=0; i<vertices.size(); ++i){
-		cout<<vertices[i].x<<","<<vertices[i].y<<","<<vertices[i].z<<endl;
+	for(int i=0; i<perfil.size(); ++i){
+		cout<<i<<": "<<perfil[i].x<<","<<perfil[i].y<<","<<perfil[i].z<<endl;
 	}
 
 	// Generamos esfera por rotacion
-	_rotacion::parametros(this->vertices, num, Y, rad);
+	_rotacion::parametros(perfil, num, Y, rad);
+
+	calcular_normales_caras();
 }
