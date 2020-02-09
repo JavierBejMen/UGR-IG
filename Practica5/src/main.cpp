@@ -19,12 +19,14 @@
 
 using namespace std;
 
+enum Proyection{PERSPECTIVE,ORTHO};
+
 // raton
 int estadoRaton[3], xc, yc, modo[5], cambio=0;
 int Ancho=450, Alto=450;
 float factor=1.0;
 
-//void pick_color(int x, int y);
+void pick_color(int x, int y);
 
 
 
@@ -35,6 +37,7 @@ GLfloat Observer_angle_y;
 
 // variables que controlan la ventana y la transformacion de perspectiva
 GLfloat Window_width,Window_height,Front_plane,Back_plane;
+Proyection camera_mode=PERSPECTIVE;
 
 // variables que determninan la posicion y tamaño de la ventana X
 int UI_window_pos_x=50,UI_window_pos_y=50,UI_window_width=920,UI_window_height=920;
@@ -156,18 +159,28 @@ glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 // Funcion para definir la transformación de proyeccion
 //***************************************************************************
 
-void change_projection()
+void change_projection(Proyection pro = PERSPECTIVE)
 {
   // Solucion para el ratio al maximizar
 	const GLfloat ratio = GLfloat(UI_window_height) / GLfloat(UI_window_width);
-
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+  glLoadIdentity();
+  switch (pro) {
+    case PERSPECTIVE:
+      glFrustum(-Window_width,Window_width,-Window_height * ratio,Window_height * ratio,Front_plane,Back_plane);
+      break;
+    case ORTHO:
+      glOrtho(-Window_width*Observer_distance, Window_width*Observer_distance,
+        -Window_height * ratio*Observer_distance, Window_height * ratio*Observer_distance,
+         Front_plane, Back_plane);
+      break;
+  }
+
 
 	// formato(x_minimo,x_maximo, y_minimo, y_maximo,Front_plane, plano_traser)
 	//  Front_plane>0  Back_plane>PlanoDelantero)
 	// glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane);
-	glFrustum(-Window_width,Window_width,-Window_height * ratio,Window_height * ratio,Front_plane,Back_plane);
+
 }
 
 //**************************************************************************
@@ -225,12 +238,11 @@ void draw_objects()
 
 void draw_scene(void)
 {
-
-clear_window();
-change_observer();
-draw_axis();
-draw_objects();
-glutSwapBuffers();
+  clear_window();
+      change_observer();
+      draw_axis();
+      draw_objects();
+  glutSwapBuffers();
 }
 
 
@@ -248,7 +260,7 @@ void change_window_size(int Ancho1,int Alto1)
   UI_window_width = Ancho1;
 	UI_window_height = Alto1;
 
-  change_projection();
+  change_projection(camera_mode);
 
   glViewport(0,0,Ancho1,Alto1);
   glutPostRedisplay();
@@ -339,8 +351,20 @@ switch (Tecla1){
 	case GLUT_KEY_RIGHT:Observer_angle_y++;break;
 	case GLUT_KEY_UP:Observer_angle_x--;break;
 	case GLUT_KEY_DOWN:Observer_angle_x++;break;
-	case GLUT_KEY_PAGE_UP:Observer_distance*=1.2;break;
-	case GLUT_KEY_PAGE_DOWN:Observer_distance/=1.2;break;
+	case GLUT_KEY_PAGE_UP:
+    Observer_distance*=1.2;
+    if(camera_mode==ORTHO){
+      change_projection(camera_mode);
+      glViewport(0,0,UI_window_width,UI_window_height);
+    }
+    break;
+	case GLUT_KEY_PAGE_DOWN:
+    Observer_distance/=1.2;
+    if(camera_mode==ORTHO){
+      change_projection(camera_mode);
+      glViewport(0,0,UI_window_width,UI_window_height);
+    }
+    break;
   case GLUT_KEY_F1: draw_mode=FLAT;break;
   case GLUT_KEY_F2: draw_mode=SMOOTH;break;
   case GLUT_KEY_F3:
@@ -351,8 +375,18 @@ switch (Tecla1){
     }else{
       rotation=false;
       glutIdleFunc(NULL);
-    }
-  }
+    }break;
+  case GLUT_KEY_F12:
+    camera_mode=PERSPECTIVE;
+    change_projection(camera_mode);
+    glViewport(0,0,UI_window_width,UI_window_height);
+    break;
+  case GLUT_KEY_F11:
+    camera_mode=ORTHO;
+    change_projection(camera_mode);
+    glViewport(0,0,UI_window_width,UI_window_height);
+  break;
+}
 glutPostRedisplay();
 }
 
@@ -372,7 +406,7 @@ Front_plane=1;
 Back_plane=1000;
 
 // se inicia la posicion del observador, en el eje z
-Observer_distance=3*Front_plane;
+Observer_distance=5*Front_plane;
 Observer_angle_x=0;
 Observer_angle_y=0;
 
@@ -383,7 +417,7 @@ glClearColor(1,1,1,1);
 // se habilita el z-bufer
 EnableLights();
 glEnable(GL_DEPTH_TEST);
-change_projection();
+change_projection(camera_mode);
 glViewport(0,0,UI_window_width,UI_window_height);
 }
 
@@ -406,7 +440,7 @@ if(boton== GLUT_LEFT_BUTTON) {
       estadoRaton[2] = 2;
       xc=x;
       yc=y;
-      //pick_color(xc, yc);
+      pick_color(xc, yc);
     }
   }
 }
@@ -443,6 +477,20 @@ if(estadoRaton[2]==1)
      yc=y;
      glutPostRedisplay();
     }
+}
+
+void pick_color(int x, int y)
+{
+  GLint viewport[4];
+unsigned char pixel[3];
+
+glGetIntegerv(GL_VIEWPORT, viewport);
+glReadBuffer(GL_BACK);
+glReadPixels(x,viewport[3]-y,1,1,GL_RGB,GL_UNSIGNED_BYTE,(GLubyte *) &pixel[0]);
+printf(" valor x %d, valor y %d, color %d, %d, %d \n",x,y,pixel[0],pixel[1],pixel[2]);
+
+//procesar_color(pixel);
+glutPostRedisplay();
 }
 
 
