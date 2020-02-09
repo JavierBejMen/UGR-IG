@@ -41,8 +41,6 @@ _rotacion cono, cilindro, prueba;
 _esfera esfera;
 Robot robot;
 
-
-
 // Variables de control
 _triangulos3D *current_object = &piramide;
 _modo draw_mode = POINTS;
@@ -50,9 +48,7 @@ bool animation = false;
 bool ball_dir=true, h_dir=true, x_dir=true, z_dir=true;
 int x_max,x_min,z_max,z_min;
 
-
-
-
+//Animation function
 void funcion_idle(){
 
   if(ball_dir){
@@ -96,6 +92,50 @@ void funcion_idle(){
 }
 
 //**************************************************************************
+//  Lights
+//***************************************************************************
+float light1_angle = 0;
+GLfloat light1_position[] = { 3.0, 3.0, 0.0, 1.0 };
+bool rotation = false;
+
+void rotating_light(){
+  light1_angle+=0.1;
+  glPushMatrix();
+    glRotated(light1_angle, 0, 1, 0);
+    glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
+  glPopMatrix();
+
+  glutPostRedisplay();
+}
+
+void EnableLights(){
+  //Parallel on y axe white light
+  GLfloat light0_position[] = { 0.0, 1.0, 0.0, 0.0 };
+  GLfloat light0_ambient[] = { .2, .2, .2, 1.0 };
+	GLfloat light0_diffuse[] = { .2, .2, .2, 1.0 };
+	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+
+  glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+  glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+
+  glEnable(GL_LIGHT0);
+
+  // Rotating magenta light
+  GLfloat light1_ambient[] = { 0., .0, 0., 1.0 };
+	GLfloat light1_diffuse[] = { 1., .0, 1., 1.0 };
+	GLfloat light1_specular[] = { 1., .0, 1., 1.0 };
+
+  glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
+  glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
+
+  glEnable(GL_LIGHT1);
+}
+
+//**************************************************************************
 //
 //***************************************************************************
 
@@ -112,13 +152,16 @@ glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 void change_projection()
 {
+  // Solucion para el ratio al maximizar
+	const GLfloat ratio = GLfloat(UI_window_height) / GLfloat(UI_window_width);
 
-glMatrixMode(GL_PROJECTION);
-glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 
-// formato(x_minimo,x_maximo, y_minimo, y_maximo,Front_plane, plano_traser)
-//  Front_plane>0  Back_plane>PlanoDelantero)
-glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane);
+	// formato(x_minimo,x_maximo, y_minimo, y_maximo,Front_plane, plano_traser)
+	//  Front_plane>0  Back_plane>PlanoDelantero)
+	// glFrustum(-Window_width,Window_width,-Window_height,Window_height,Front_plane,Back_plane);
+	glFrustum(-Window_width,Window_width,-Window_height * ratio,Window_height * ratio,Front_plane,Back_plane);
 }
 
 //**************************************************************************
@@ -165,7 +208,7 @@ glEnd();
 
 void draw_objects()
 {
-  current_object->draw(draw_mode, 1.0,0.5,0.0,.0,.5,1.,1);
+  current_object->draw(draw_mode, .8,.8,.8,.0,.5,1.,1);
 }
 
 
@@ -196,10 +239,13 @@ glutSwapBuffers();
 
 void change_window_size(int Ancho1,int Alto1)
 {
-change_projection();
+  UI_window_width = Ancho1;
+	UI_window_height = Alto1;
 
-glViewport(0,0,min(Ancho1,Alto1),min(Ancho1,Alto1));
-glutPostRedisplay();
+  change_projection();
+
+  glViewport(0,0,Ancho1,Alto1);
+  glutPostRedisplay();
 }
 
 
@@ -289,7 +335,18 @@ switch (Tecla1){
 	case GLUT_KEY_DOWN:Observer_angle_x++;break;
 	case GLUT_KEY_PAGE_UP:Observer_distance*=1.2;break;
 	case GLUT_KEY_PAGE_DOWN:Observer_distance/=1.2;break;
-	}
+  case GLUT_KEY_F1: draw_mode=FLAT;break;
+  case GLUT_KEY_F2: draw_mode=SMOOTH;break;
+  case GLUT_KEY_F3:
+    if(!rotation){
+      //idle function
+      glutIdleFunc(rotating_light);
+      rotation=true;
+    }else{
+      rotation=false;
+      glutIdleFunc(NULL);
+    }
+  }
 glutPostRedisplay();
 }
 
@@ -298,6 +355,7 @@ glutPostRedisplay();
 //***************************************************************************
 // Funcion de incializacion
 //***************************************************************************
+
 
 void initialize(void)
 {
@@ -317,6 +375,7 @@ Observer_angle_y=0;
 glClearColor(1,1,1,1);
 
 // se habilita el z-bufer
+EnableLights();
 glEnable(GL_DEPTH_TEST);
 change_projection();
 glViewport(0,0,UI_window_width,UI_window_height);
@@ -380,7 +439,7 @@ int main(int argc, char **argv)
     cono.parametros("data/cono", 40);
     cilindro.parametros("data/cilindro", 40);
     prueba.parametros("data/prueba", 20, Z, 2*M_PI*0.75);
-    esfera.parametros(0.5, 3);
+    esfera.parametros(0.5, 40);
 
     // inicio del bucle de eventos
     glutMainLoop();

@@ -14,7 +14,7 @@ const float AXIS_SIZE=5000;
 
 enum eje_rot{X=0,Y,Z};
 
-typedef enum{POINTS,EDGES,SOLID_CHESS,SOLID} _modo;
+typedef enum{POINTS,EDGES,SOLID_CHESS,SOLID,FLAT,SMOOTH} _modo;
 
 //*************************************************************************
 // clase punto
@@ -60,7 +60,7 @@ bool b_normales_vertices;
 
 _vertex4f ambiente_difusa;     //coeficientes ambiente y difuso
 _vertex4f especular;           //coeficiente especular
-float brillo; 
+float brillo;
 };
 
 
