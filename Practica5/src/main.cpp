@@ -18,7 +18,13 @@
 #include <stdlib.h>
 
 using namespace std;
-// tamaño de los ejes
+
+// raton
+int estadoRaton[3], xc, yc, modo[5], cambio=0;
+int Ancho=450, Alto=450;
+float factor=1.0;
+
+//void pick_color(int x, int y);
 
 
 
@@ -381,6 +387,64 @@ change_projection();
 glViewport(0,0,UI_window_width,UI_window_height);
 }
 
+//***************************************************************************
+// Funciones para manejo de eventos del ratón
+//***************************************************************************
+
+void clickRaton( int boton, int estado, int x, int y )
+{
+if(boton== GLUT_RIGHT_BUTTON) {
+   if( estado == GLUT_DOWN) {
+      estadoRaton[2] = 1;
+      xc=x;
+      yc=y;
+     }
+   else estadoRaton[2] = 1;
+   }
+if(boton== GLUT_LEFT_BUTTON) {
+  if( estado == GLUT_DOWN) {
+      estadoRaton[2] = 2;
+      xc=x;
+      yc=y;
+      //pick_color(xc, yc);
+    }
+  }
+}
+
+/*************************************************************************/
+
+void getCamara (GLfloat *x, GLfloat *y)
+{
+*x=Observer_angle_x;
+*y=Observer_angle_y;
+}
+
+/*************************************************************************/
+
+void setCamara (GLfloat x, GLfloat y)
+{
+Observer_angle_x=x;
+Observer_angle_y=y;
+}
+
+
+
+/*************************************************************************/
+
+void RatonMovido( int x, int y )
+{
+float x0, y0, xn, yn;
+if(estadoRaton[2]==1)
+    {getCamara(&x0,&y0);
+     yn=y0+(y-yc);
+     xn=x0-(x-xc);
+     setCamara(xn,yn);
+     xc=x;
+     yc=y;
+     glutPostRedisplay();
+    }
+}
+
 
 //***************************************************************************
 // Programa principal
@@ -430,6 +494,9 @@ int main(int argc, char **argv)
     glutKeyboardFunc(normal_keys);
     // asignación de la funcion llamada "tecla_Especial" al evento correspondiente
     glutSpecialFunc(special_keys);
+    // eventos ratón
+    glutMouseFunc( clickRaton );
+    glutMotionFunc( RatonMovido );
 
     // funcion de inicialización
     initialize();
