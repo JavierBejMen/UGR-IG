@@ -32,11 +32,11 @@ namespace _file_ply
 // * si hay un error, aborta
 // * elimina cualquier contenido previo en los vectores 'vertices' y 'faces'
 // * lee el archivo .ply y lo carga en 'vertices' y 'faces'
-// * solo admite plys con triángulos, 
+// * solo admite plys con triángulos,
 // * no lee colores, coordenadas de textura, ni normales.
 
 void read( const char * nombreArchivo, vector<float> &Vertices,vector<int> &Faces );
-   
+
 } ;
 
 #endif // _READ_PLY

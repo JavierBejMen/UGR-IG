@@ -19,10 +19,10 @@ else
 	CCFLAGS += -w
 endif
 
-GLFLAGS = -lGL -lGLU -lglut
+GLFLAGS = -lGL -lGLU -lglut -lm -lX11 -lpthread -L/usr/X11R6/lib/
 
 MAINDEPENDENCIES = $(OBJ)/objetos_B.o $(OBJ)/main.o $(OBJ)/file_ply_stl.o \
-$(OBJ)/Robot.o
+$(OBJ)/Robot.o $(OBJ)/Texture.o
 
 TARGETS = clean $(BIN)/main
 
@@ -41,6 +41,9 @@ $(OBJ)/file_ply_stl.o: $(SRC)/file_ply_stl.cpp
 	$(CC) $(CCFLAGS) -c -o $@ $^ -I$(INCLUDE)
 
 $(OBJ)/Robot.o: $(SRC)/Robot.cpp
+	$(CC) $(CCFLAGS) -c -o $@ $^ -I$(INCLUDE)
+
+$(OBJ)/Texture.o: $(SRC)/Texture.cpp
 	$(CC) $(CCFLAGS) -c -o $@ $^ -I$(INCLUDE)
 
 
