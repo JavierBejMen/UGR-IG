@@ -49,7 +49,7 @@ public:
 	void 	draw_iluminacion_suave( );
 
 	void draw_selection();
-	vector<bool> alt_triangle_color;
+
 
 	void	calcular_normales_caras();
 	void 	calcular_normales_vertices();
@@ -58,12 +58,17 @@ public:
 	vector<_vertex3f> normales_caras;
 	vector<_vertex3f> normales_vertices;
 
+	void virtual alt_triangle(int i);
+	vector<bool> alt_triangle_color;
+
 	bool b_normales_caras;
 	bool b_normales_vertices;
 
 	_vertex4f ambiente_difusa;     //coeficientes ambiente y difuso
 	_vertex4f especular;           //coeficiente especular
 	float brillo;
+
+
 };
 
 

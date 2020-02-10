@@ -9,6 +9,7 @@ public:
   Chasis();
   void 	draw(_modo modo, float r1, float g1, float b1,
     float r2, float g2, float b2, float grosor) override;
+  void alt_triangle(int i) override;
 
 private:
   _rotacion lower;
@@ -21,6 +22,7 @@ public:
   Vsupport();
   void 	draw(_modo modo, float r1, float g1, float b1,
     float r2, float g2, float b2, float grosor) override;
+  void alt_triangle(int i) override;
 
 private:
   _rotacion rod;
@@ -37,6 +39,9 @@ public:
   _vertex3f position;
   float velocity, wheel_angle_z, wheel_angle_x, chasis_angle, chasis_velocity;
   float h_dplcmnt, string_length, ball_angle;
+
+  //Selects object instead of traingle
+  void alt_triangle(int i) override;
 
 private:
   _esfera wheel;

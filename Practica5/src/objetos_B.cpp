@@ -221,6 +221,10 @@ void _triangulos3D::draw_selection(){
 
 }
 
+void _triangulos3D::alt_triangle(int i){
+	alt_triangle_color[i-1]=!alt_triangle_color[i-1];
+}
+
 
 //*************************************************************************
 // Normales

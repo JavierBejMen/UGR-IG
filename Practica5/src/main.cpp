@@ -493,8 +493,8 @@ void hits_process(GLint hits, GLuint *names ){
 		cout << "Max Z: " << names[i * 4 + 2] << endl;
 		cout << "Nombre en la pila: " << names[i * 4 + 3] << endl;
 
-    current_object->alt_triangle_color[names[i * 4 + 3]]=!
-      current_object->alt_triangle_color[names[i * 4 + 3]];
+
+    current_object->alt_triangle(names[i * 4 + 3]);
 	}
 
 	cout << endl;
@@ -526,8 +526,18 @@ void pick(int x, int y)
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   gluPickMatrix(x, viewport[3]-y, 1, 1, viewport);
-  glFrustum(-Window_width, Window_width, -Window_height, Window_height, Front_plane, Back_plane);
-
+  //glFrustum(-Window_width, Window_width, -Window_height, Window_height, Front_plane, Back_plane);
+  const GLfloat ratio = GLfloat(UI_window_height) / GLfloat(UI_window_width);
+  switch (camera_mode) {
+    case PERSPECTIVE:
+      glFrustum(-Window_width,Window_width,-Window_height * ratio,Window_height * ratio,Front_plane,Back_plane);
+      break;
+    case ORTHO:
+      glOrtho(-Window_width*Observer_distance, Window_width*Observer_distance,
+        -Window_height * ratio*Observer_distance, Window_height * ratio*Observer_distance,
+         Front_plane, Back_plane);
+      break;
+  }
 
   //Dibujar escena
   _modo prev_mode = draw_mode;

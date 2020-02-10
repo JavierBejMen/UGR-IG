@@ -20,6 +20,15 @@ void Chasis::draw(_modo modo, float r1, float g1, float b1,
   glPopMatrix();
 }
 
+void Chasis::alt_triangle(int whatever){
+  for(int i=0; i<lower.caras.size();++i){
+    lower.alt_triangle(i+1);
+  }
+  for(int i=0; i<upper.caras.size();++i){
+    upper.alt_triangle(i+1);
+  }
+}
+
 
 //*************************************************************************
 // clase Vsupport
@@ -45,6 +54,15 @@ void Vsupport::draw(_modo modo, float r1, float g1, float b1,
   glPopMatrix();
 
 }
+
+void Vsupport::alt_triangle(int whatever){
+  for(int i=0; i<rod.caras.size();++i){
+    rod.alt_triangle(i+1);
+  }
+  for(int i=0; i<v_support.caras.size();++i){
+    v_support.alt_triangle(i+1);
+  }
+}
 //*************************************************************************
 // clase Robot
 //*************************************************************************
@@ -67,6 +85,11 @@ Robot::Robot(){
 void Robot::draw(_modo modo, float r1, float g1, float b1,
   float r2, float g2, float b2, float grosor)
   {
+    bool select = false;
+    if(modo == SELECT){
+      select = true;
+      modo = EDGES;
+    }
     glPushMatrix();
       //x,z movement
       glTranslatef(position.x, 0, position.z);
@@ -76,6 +99,7 @@ void Robot::draw(_modo modo, float r1, float g1, float b1,
         //Wheel rotation on x,z movement
         glRotatef(wheel_angle_z, 0,0,1);
         glRotatef(wheel_angle_x, 1,0,0);
+        glLoadName(1);
         wheel.draw(modo, r1, g1, b1, r2, g2, b2, grosor);
       glPopMatrix();
 
@@ -83,8 +107,9 @@ void Robot::draw(_modo modo, float r1, float g1, float b1,
 
         //Chasis rotation
         glRotatef(chasis_angle,0,1,0);
-
+        glLoadName(2);
         chasis.draw(modo, r1, g1, b1, r2, g2, b2, grosor);
+        glLoadName(3);
         v_support.draw(modo, r1, g1, b1, r2, g2, b2, grosor);
 
         glPushMatrix();
@@ -93,6 +118,7 @@ void Robot::draw(_modo modo, float r1, float g1, float b1,
           glPushMatrix();
             glTranslatef(0,1.52,0);
             glScalef(0.25,0.25,5);
+            glLoadName(4);
             h_support.draw(modo, r1, g1, b1, r2, g2, b2, grosor);
           glPopMatrix();
 
@@ -101,6 +127,7 @@ void Robot::draw(_modo modo, float r1, float g1, float b1,
             //String length
             glScalef(0.1,string_length,0.1);
             glTranslatef(0,-0.5,0);
+            glLoadName(5);
             string.draw(modo, r1, g1, b1, r2, g2, b2, grosor);
           glPopMatrix();
 
@@ -109,10 +136,44 @@ void Robot::draw(_modo modo, float r1, float g1, float b1,
             //Rotate ball
             glTranslatef(0, 1.5-string_length, 2.4);
             glRotatef(ball_angle,0,1,0);
+            glLoadName(6);
             ball.draw(modo, r1, g1, b1, r2, g2, b2, grosor);
           glPopMatrix();
 
         glPopMatrix();
       glPopMatrix();
     glPopMatrix();
+  }
+
+  void Robot::alt_triangle(int i){
+
+    switch (i) {
+      case 1:
+        cout<<wheel.caras.size()<<"   "<<wheel.alt_triangle_color.size();
+        for(int j=0;j<wheel.caras.size();++j){
+          wheel.alt_triangle(j+1);
+        }
+        break;
+      case 2:
+        chasis.alt_triangle(0);
+        break;
+      case 3:
+        v_support.alt_triangle(0);
+        break;
+      case 4:
+        for(int j=0;j<h_support.caras.size();++j){
+          h_support.alt_triangle(j+1);
+        }
+        break;
+      case 5:
+        for(int j=0;j<string.caras.size();++j){
+          string.alt_triangle(j+1);
+        }
+        break;
+      case 6:
+        for(int j=0;j<ball.caras.size();++j){
+          ball.alt_triangle(j+1);
+        }
+        break;
+    }
   }
